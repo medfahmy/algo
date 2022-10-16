@@ -12,17 +12,13 @@ use Order::*;
 pub fn insertion_sort<T: Ord + Copy>(slice: &mut [T], order: Order) {
     for i in 2..slice.len() {
         for j in 0..i {
-            match order {
-                Asc => {
-                    if slice[i] < slice[j] {
-                        slice.swap(i, j);
-                    }
-                }
-                Desc => {
-                    if slice[i] > slice[j] {
-                        slice.swap(i, j);
-                    }
-                }
+            let should_swap = match order {
+                Asc => slice[i] < slice[j],
+                Desc => slice[i] > slice[j],
+            };
+
+            if should_swap {
+                slice.swap(i, j);
             }
         }
     }
@@ -150,7 +146,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ins_works() {
+    fn insertion() {
         let mut arr0: [u8; 0] = [];
         let mut arr1: [u8; 1] = [1];
         let mut arr: [u8; 6] = [5, 2, 4, 6, 1, 3];
