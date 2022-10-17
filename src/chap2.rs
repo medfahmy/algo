@@ -124,7 +124,12 @@ pub fn binary_search<T: Ord>(slice: &[T], target: T) -> Option<usize> {
     binary_search_ind(slice, target, 0, slice.len())
 }
 
-fn binary_search_ind<T: Ord>(slice: &[T], target: T, start: usize, end: usize) -> Option<usize> {
+fn binary_search_ind<T: Ord>(
+    slice: &[T],
+    target: T,
+    start: usize,
+    end: usize,
+) -> Option<usize> {
     if start == end {
         None
     } else {
