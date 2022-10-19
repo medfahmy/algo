@@ -112,12 +112,7 @@ pub fn binary_search<T: Ord>(slice: &[T], target: T) -> Option<usize> {
     binary_search_ind(slice, target, 0, slice.len())
 }
 
-fn binary_search_ind<T: Ord>(
-    slice: &[T],
-    target: T,
-    start: usize,
-    end: usize,
-) -> Option<usize> {
+fn binary_search_ind<T: Ord>(slice: &[T], target: T, start: usize, end: usize) -> Option<usize> {
     if start == end {
         None
     } else {
@@ -127,6 +122,16 @@ fn binary_search_ind<T: Ord>(
             Equal => Some(mi),
             Less => binary_search_ind(slice, target, start, mi),
             Greater => binary_search_ind(slice, target, mi + 1, end),
+        }
+    }
+}
+
+pub fn bubble_sort<T: Ord>(slice: &mut [T]) {
+    for i in 0..slice.len() {
+        for j in (i + 1..slice.len()).rev() {
+            if slice[j] < slice[j - 1] {
+                slice.swap(j, j - 1);
+            }
         }
     }
 }
@@ -214,5 +219,21 @@ mod tests {
         assert_eq!(binary_search(&c, 20), Some(6));
         assert_eq!(binary_search(&c, 18), None);
         assert_eq!(binary_search(&c, 7), Some(3));
+    }
+
+    #[test]
+    fn bubble_works() {
+        let mut arr0: [u8; 0] = [];
+        let mut arr1: [u8; 1] = [1];
+        let mut arr: [u8; 6] = [5, 2, 4, 6, 1, 3];
+
+        bubble_sort(&mut arr0);
+        assert_eq!(arr0, []);
+
+        bubble_sort(&mut arr1);
+        assert_eq!(arr1, [1]);
+
+        bubble_sort(&mut arr);
+        assert_eq!(arr, [1, 2, 3, 4, 5, 6]);
     }
 }
