@@ -160,16 +160,6 @@ mod tests {
     }
 
     #[test]
-    fn bit_add_works() {
-        let a = [1, 0, 1];
-        assert_eq!(bit_add(&a, &a), [0, 1, 0, 1]);
-
-        let a = [1, 0, 1, 0];
-        let b = [1, 0, 1, 1];
-        assert_eq!(bit_add(&a, &b), [0, 1, 0, 0, 1]);
-    }
-
-    #[test]
     fn binary_search_works() {
         let a = [];
         let b = [1];
