@@ -12,42 +12,6 @@ pub fn insertion_sort<T: Ord>(slice: &mut [T]) {
     }
 }
 
-pub fn linear_search<T: Ord>(slice: &[T], target: T) -> Option<usize> {
-    for (i, x) in slice.iter().enumerate() {
-        if *x == target {
-            return Some(i);
-        }
-    }
-
-    None
-}
-
-pub fn bit_add<const N: usize>(a: &[usize; N], b: &[usize; N]) -> [usize; N + 1] {
-    let mut result = [0; N + 1];
-
-    for i in 0..N {
-        match a[i] + b[i] {
-            0 => {}
-            1 => {
-                if result[i] == 0 {
-                    result[i] = 1;
-                } else if result[i] == 1 {
-                    result[i] = 0;
-                    result[i + 1] = 1;
-                }
-            }
-            2 => {
-                result[i + 1] += 1;
-            }
-            _ => {
-                unreachable!("invalid bit");
-            }
-        }
-    }
-
-    result
-}
-
 pub fn selection_sort<T: Ord>(slice: &mut [T]) {
     for i in 0..slice.len() {
         for j in i..slice.len() {
