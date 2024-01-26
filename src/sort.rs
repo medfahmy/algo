@@ -1,7 +1,5 @@
 #![allow(unused, warnings)]
 
-use std::collections::VecDeque;
-
 pub fn insertion_sort<T: Ord>(slice: &mut [T]) {
     for i in 2..slice.len() {
         for j in 0..i {
@@ -26,29 +24,27 @@ pub fn merge_sort<T: Ord + Clone>(slice: &mut [T]) {
     merge_ind(slice, 0, slice.len());
 }
 
-pub fn merge_ind<T: Ord + Clone>(slice: &mut [T], p: usize, r: usize) {
-    if p + 1 < r {
-        let q = (r - p) / 2 + p;
-        merge_ind(slice, p, q);
-        merge_ind(slice, q, r);
-        merge(slice, p, q, r);
+pub fn merge_ind<T: Ord + Clone>(slice: &mut [T], low: usize, high: usize) {
+    if low + 1 < high {
+        let mid = (high - low) / 2 + low;
+        merge_ind(slice, low, mid);
+        merge_ind(slice, mid, high);
+        merge(slice, low, mid, high);
     }
 }
 
-fn merge<T: Ord + Clone>(slice: &mut [T], p: usize, q: usize, r: usize) {
-    assert!(p < q, "p = {}, q = {}", p, q);
-    assert!(q < r, "q = {}, r = {}", q, r);
+fn merge<T: Ord + Clone>(slice: &mut [T], low: usize, pivot: usize, high: usize) {
+    assert!(low < pivot, "p = {}, q = {}", low, pivot);
+    assert!(pivot < high, "q = {}, r = {}", pivot, high);
 
-    let mut le = &slice[p..q].to_vec();
-    let mut ri = &slice[q..r].to_vec();
-
-    let x = le.get(0);
+    let mut left = slice[low..pivot].to_vec();
+    let mut right = slice[pivot..high].to_vec();
 
     let mut i = 0;
     let mut j = 0;
 
-    for k in p..r {
-        match (le.get(i), ri.get(j)) {
+    for k in low..high {
+        match (left.get(i), right.get(j)) {
             (None, None) => break,
             (Some(l), None) => {
                 slice[k] = l.clone();
@@ -80,12 +76,12 @@ fn binary_search_ind<T: Ord>(slice: &[T], target: T, start: usize, end: usize) -
     if start == end {
         None
     } else {
-        let mi = (end - start) / 2 + start;
+        let mid = (end - start) / 2 + start;
 
-        match target.cmp(&slice[mi]) {
-            Equal => Some(mi),
-            Less => binary_search_ind(slice, target, start, mi),
-            Greater => binary_search_ind(slice, target, mi + 1, end),
+        match target.cmp(&slice[mid]) {
+            Equal => Some(mid),
+            Less => binary_search_ind(slice, target, start, mid),
+            Greater => binary_search_ind(slice, target, mid + 1, end),
         }
     }
 }
