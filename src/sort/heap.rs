@@ -99,8 +99,8 @@ mod tests {
     #[test]
     fn heapsort_works() {
         let mut arr0: [u8; 0] = [];
-        let mut arr1: [u8; 1] = [1];
-        let mut arr: [u8; 6] = [5, 2, 4, 6, 1, 3];
+        let mut arr1 = [1];
+        let mut arr = [5, 2, 4, 6, 1, 3];
 
         heap_sort(&mut arr0);
         assert_eq!(arr0, []);
