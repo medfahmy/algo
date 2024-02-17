@@ -1,6 +1,6 @@
 pub struct Node<T> {
     value: T,
-    parent: Option<Box<Node<T>>>,
+    // parent: Option<Box<Node<T>>>,
     left: Option<Box<Node<T>>>,
     right: Option<Box<Node<T>>>,
 }
@@ -9,7 +9,7 @@ impl<T> Node<T> where T: PartialEq + PartialOrd {
     pub fn new(value: T) -> Self {
         Node {
             value,
-            parent: None,
+            // parent: None,
             left: None,
             right: None,
         }
@@ -104,11 +104,11 @@ impl<T> Node<T> where T: PartialEq + PartialOrd {
     pub fn pred(&self) {}
 }
 
-impl<T> From<&[T]> for Node<T> {
-    fn from(value: &[T]) -> Node<T> {
-        todo!();
-    }
-}
+// impl<T> From<&[T]> for Node<T> {
+//     fn from(value: &[T]) -> Node<T> {
+//         todo!();
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

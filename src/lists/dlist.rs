@@ -145,6 +145,30 @@ impl<T> Drop for DList<T> {
     }
 }
 
+pub struct IntoIter<T>(DList<T>);
+
+impl<T> IntoIterator for DList<T> {
+    type Item = T;
+    type IntoIter = IntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter(self)
+    }
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.pop_front()
+    }
+}
+
+impl<T> DoubleEndedIterator for IntoIter<T> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.0.pop_back()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

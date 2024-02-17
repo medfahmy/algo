@@ -31,9 +31,9 @@ fn partition<T: Ord + Debug>(arr: &mut [T], low: usize, high: usize) -> usize {
     pivot
 }
 
-fn partition2<T: Ord + Debug>(arr: &mut [T], low: usize, high: usize) -> usize {
-    0
-}
+// fn partition2<T: Ord + Debug>(arr: &mut [T], low: usize, high: usize) -> usize {
+//     0
+// }
 
 #[cfg(test)]
 mod tests {
