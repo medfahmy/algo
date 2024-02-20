@@ -2,7 +2,6 @@
 
 use std::fmt::Debug;
 
-
 fn parent(i: usize) -> usize {
     (i - 1) >> 1
 }
@@ -77,9 +76,9 @@ mod tests {
 
     #[test]
     fn max_heapify_works() {
-        let mut arr = [16, 4, 10, 14, 7, 9, 3, 2, 8 , 1];
+        let mut arr = [16, 4, 10, 14, 7, 9, 3, 2, 8, 1];
         let heapsize = arr.len();
-        let expected = [16, 14, 10, 8, 7, 9, 3, 2, 4 , 1];
+        let expected = [16, 14, 10, 8, 7, 9, 3, 2, 4, 1];
 
         max_heapify(&mut arr, 1, heapsize);
 
@@ -89,7 +88,7 @@ mod tests {
     #[test]
     fn build_max_heap_works() {
         let mut arr = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7];
-        let expected = [16, 14, 10, 8, 7, 9, 3, 2, 4 , 1];
+        let expected = [16, 14, 10, 8, 7, 9, 3, 2, 4, 1];
 
         build_max_heap(&mut arr);
 

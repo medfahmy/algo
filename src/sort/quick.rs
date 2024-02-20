@@ -27,7 +27,7 @@ fn partition<T: Ord + Debug>(arr: &mut [T], low: usize, high: usize) -> usize {
     }
 
     arr.swap(pivot, high);
-    
+
     pivot
 }
 

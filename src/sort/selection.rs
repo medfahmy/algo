@@ -12,7 +12,6 @@ pub fn selection_sort<T: Ord>(slice: &mut [T]) {
 mod tests {
     use super::*;
 
-
     #[test]
     fn selection_sort_works() {
         let mut arr0: [u8; 0] = [];

@@ -5,7 +5,10 @@ pub struct Node<T> {
     right: Option<Box<Node<T>>>,
 }
 
-impl<T> Node<T> where T: PartialEq + PartialOrd {
+impl<T> Node<T>
+where
+    T: PartialEq + PartialOrd,
+{
     pub fn new(value: T) -> Self {
         Node {
             value,

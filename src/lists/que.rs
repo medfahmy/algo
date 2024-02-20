@@ -1,4 +1,4 @@
-use std::{mem, ptr};
+use std::ptr;
 
 type Link<T> = Option<Box<Node<T>>>;
 
@@ -21,10 +21,7 @@ impl<T> Queue<T> {
     }
 
     pub fn enqueue(&mut self, value: T) {
-        let mut new_tail = Box::new(Node {
-            value,
-            next: None,
-        });
+        let mut new_tail = Box::new(Node { value, next: None });
 
         let raw_tail: *mut _ = &mut *new_tail;
 
@@ -61,10 +58,13 @@ mod tests {
     fn enq_deq() {
         let mut q = Queue::new();
         assert_eq!(q.dequeue(), None);
-        q.enqueue(1); q.enqueue(2); q.enqueue(3);
+        q.enqueue(1);
+        q.enqueue(2);
+        q.enqueue(3);
         assert_eq!(q.dequeue(), Some(1));
         assert_eq!(q.dequeue(), Some(2));
-        q.enqueue(4); q.enqueue(5);
+        q.enqueue(4);
+        q.enqueue(5);
         assert_eq!(q.dequeue(), Some(3));
         assert_eq!(q.dequeue(), Some(4));
         assert_eq!(q.dequeue(), Some(5));

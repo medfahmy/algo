@@ -49,7 +49,9 @@ pub struct Iter<'a, T> {
 
 impl<T> ImList<T> {
     pub fn iter(&self) -> Iter<'_, T> {
-        Iter { next: self.head.as_deref() }
+        Iter {
+            next: self.head.as_deref(),
+        }
     }
 }
 
