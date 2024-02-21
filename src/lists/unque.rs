@@ -71,40 +71,11 @@ impl<T> Drop for Que<T> {
 
 pub struct IntoIter<T>(Que<T>);
 
-pub struct Iter<'a, T> {
-    next: Option<&'a Node<T>>,
-}
-
-pub struct IterMut<'a, T> {
-    next: Option<&'a mut Node<T>>,
-}
-
-impl<T> Que<T> {
-    pub fn into_iter(self) -> IntoIter<T> {
-        IntoIter(self)
-    }
-
-    pub fn iter(&self) -> Iter<'_, T> {
-        unsafe {
-            Iter {
-                next: self.head.as_ref(),
-            }
-        }
-    }
-
-    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
-        unsafe {
-            IterMut {
-                next: self.head.as_mut(),
-            }
-        }
-    }
-}
-
 impl<T> IntoIterator for Que<T> {
     type Item = T;
     type IntoIter = IntoIter<T>;
-    fn into_iter(self) -> Self::IntoIter {
+
+    fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
 }
@@ -114,6 +85,51 @@ impl<T> Iterator for IntoIter<T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.0.deque()
+    }
+}
+
+
+pub struct Iter<'a, T> {
+    next: Option<&'a Node<T>>,
+}
+
+pub struct IterMut<'a, T> {
+    next: Option<&'a mut Node<T>>,
+}
+
+impl<T> Que<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
+        unsafe {
+            Iter {
+                next: self.head.as_ref(),
+            }
+        }
+    }
+
+    pub fn iter_mut(&self) -> IterMut<'_, T> {
+        unsafe {
+            IterMut {
+                next: self.head.as_mut(),
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Que<T> {
+    type Item = &'a T;
+    type IntoIter = Iter<'a, T>;
+
+    fn into_iter(self) -> Iter<'a, T> {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Que<T> {
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+
+    fn into_iter(self) -> IterMut<'a, T> {
+        self.iter_mut()
     }
 }
 
