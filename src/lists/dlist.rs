@@ -40,6 +40,14 @@ impl<T> DList<T> {
         while self.pop_head().is_some() {}
     }
 
+    pub fn cursor_mut(&mut self) -> CursorMut<'_, T> {
+        CursorMut {
+            list: self,
+            curr: None,
+            index: None,
+        }
+    }
+
     pub fn push_head(&mut self, value: T) {
         unsafe {
             let new_head = NonNull::new_unchecked(Box::into_raw(Box::new(Node {
@@ -141,6 +149,52 @@ impl<T> DList<T> {
     pub fn tail_mut(&mut self) -> Option<&mut T> {
         unsafe {
             self.tail.map(|tail| &mut (*tail.as_ptr()).value)
+        }
+    }
+}
+
+pub struct CursorMut<'a, T> {
+    curr: Link<T>,
+    list: &'a mut DList<T>,
+    index: Option<usize>,
+}
+
+impl<'a, T> CursorMut<'a, T> {
+    pub fn index(&self) -> Option<usize> {
+        self.index
+    }
+
+    pub fn move_next(&mut self) {
+        if let Some(curr) = self.curr {
+            unsafe {
+                self.curr = (*curr.as_ptr()).prev;
+
+                if self.curr.is_some() {
+                    *self.index.as_mut().unwrap() += 1;
+                } else {
+                    self.index = None;
+                }
+            }
+        } else if !self.list.is_empty() {
+            self.curr = self.list.head;
+            self.index = Some(0);
+        }
+    }
+
+    pub fn move_prev(&mut self) {
+        if let Some(curr) = self.curr {
+            unsafe {
+                self.curr = (*curr.as_ptr()).next;
+
+                if self.curr.is_some() {
+                    *self.index.as_mut().unwrap() -= 1;
+                } else {
+                    self.index = None;
+                }
+            }
+        } else if !self.list.is_empty() {
+            self.curr = self.list.head;
+            self.index = Some(self.list.len() - 1);
         }
     }
 }
