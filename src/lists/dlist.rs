@@ -1,5 +1,5 @@
-use std::ptr::NonNull;
 use std::marker::PhantomData;
+use std::ptr::NonNull;
 
 type Link<T> = Option<NonNull<Node<T>>>;
 
@@ -129,27 +129,19 @@ impl<T> DList<T> {
     }
 
     pub fn head(&self) -> Option<&T> {
-        unsafe {
-            self.head.map(|head| &(*head.as_ptr()).value)
-        }
+        unsafe { self.head.map(|head| &(*head.as_ptr()).value) }
     }
 
     pub fn head_mut(&mut self) -> Option<&mut T> {
-        unsafe {
-            self.head.map(|head| &mut (*head.as_ptr()).value)
-        }
+        unsafe { self.head.map(|head| &mut (*head.as_ptr()).value) }
     }
 
     pub fn tail(&self) -> Option<&T> {
-        unsafe {
-            self.tail.map(|tail| &(*tail.as_ptr()).value)
-        }
+        unsafe { self.tail.map(|tail| &(*tail.as_ptr()).value) }
     }
 
     pub fn tail_mut(&mut self) -> Option<&mut T> {
-        unsafe {
-            self.tail.map(|tail| &mut (*tail.as_ptr()).value)
-        }
+        unsafe { self.tail.map(|tail| &mut (*tail.as_ptr()).value) }
     }
 }
 
@@ -167,7 +159,7 @@ impl<'a, T> CursorMut<'a, T> {
     pub fn move_next(&mut self) {
         if let Some(curr) = self.curr {
             unsafe {
-                self.curr = (*curr.as_ptr()).prev;
+                self.curr = (*curr.as_ptr()).next;
 
                 if self.curr.is_some() {
                     *self.index.as_mut().unwrap() += 1;
@@ -184,7 +176,7 @@ impl<'a, T> CursorMut<'a, T> {
     pub fn move_prev(&mut self) {
         if let Some(curr) = self.curr {
             unsafe {
-                self.curr = (*curr.as_ptr()).next;
+                self.curr = (*curr.as_ptr()).prev;
 
                 if self.curr.is_some() {
                     *self.index.as_mut().unwrap() -= 1;
@@ -193,8 +185,124 @@ impl<'a, T> CursorMut<'a, T> {
                 }
             }
         } else if !self.list.is_empty() {
-            self.curr = self.list.head;
+            self.curr = self.list.tail;
             self.index = Some(self.list.len() - 1);
+        }
+    }
+
+    pub fn current(&mut self) -> Option<&mut T> {
+        unsafe { self.curr.map(|node| &mut (*node.as_ptr()).value) }
+    }
+
+    pub fn peek_next(&mut self) -> Option<&mut T> {
+        unsafe {
+            self.curr
+                .and_then(|node| (*node.as_ptr()).next)
+                .map(|next| &mut (*next.as_ptr()).value)
+        }
+    }
+
+    pub fn peek_prev(&mut self) -> Option<&mut T> {
+        unsafe {
+            self.curr
+                .and_then(|node| (*node.as_ptr()).prev)
+                .map(|prev| &mut (*prev.as_ptr()).value)
+        }
+    }
+
+    pub fn split_before(&mut self) -> DList<T> {
+        if let Some(curr) = self.curr {
+            unsafe {
+                let old_len = self.list.len;
+                let old_idx = self.index.unwrap();
+                let prev = (*curr.as_ptr()).prev;
+
+                let new_len = old_len - old_idx;
+                let new_head = self.curr;
+                let new_tail = self.list.tail;
+                let new_idx = Some(0);
+
+                let output_len = old_idx;
+                let output_head = self.list.head;
+                let output_tail = prev;
+
+                if let Some(prev) = prev {
+                    (*curr.as_ptr()).prev = None;
+                    (*prev.as_ptr()).next = None;
+                }
+
+                self.list.len = new_len;
+                self.list.head = new_head;
+                self.list.tail = new_tail;
+                self.index = new_idx;
+
+                DList {
+                    head: output_head,
+                    tail: output_tail,
+                    len: output_len,
+                    phantom: PhantomData,
+                }
+            }
+        } else {
+            std::mem::replace(self.list, DList::new())
+        }
+    }
+
+    pub fn split_after(&mut self) -> DList<T> {
+        if let Some(curr) = self.curr {
+            unsafe {
+                let old_len = self.list.len;
+                let old_idx = self.index.unwrap();
+                let next = (*curr.as_ptr()).next;
+
+                let new_len = old_idx;
+                let new_head = self.list.head;
+                let new_tail = self.curr;
+                let new_idx = Some(old_idx);
+
+                let output_len = old_len - old_idx;
+                let output_head = next;
+                let output_tail = self.list.tail;
+
+                if let Some(next) = next {
+                    (*curr.as_ptr()).next = None;
+                    (*next.as_ptr()).prev = None;
+                }
+
+                self.list.len = new_len;
+                self.list.head = new_head;
+                self.list.tail = new_tail;
+                self.index = new_idx;
+
+                DList {
+                    head: output_head,
+                    tail: output_tail,
+                    len: output_len,
+                    phantom: PhantomData,
+                }
+            }
+        } else {
+            std::mem::replace(self.list, DList::new())
+        }
+    }
+
+    pub fn splice_before(&mut self, mut input: DList<T>) {
+        unsafe {
+            if input.is_empty() {
+                return;
+            } else if let Some(curr) = self.curr {
+                if let Some(0) = self.index {
+                    (*curr.as_ptr()).prev = input.tail.take();
+                    (*input.tail.unwrap().as_ptr()).next = Some(curr);
+                    self.list.head = input.head.take();
+
+                    *self.index.as_mut().unwrap() += input.len;
+                    input.len = 0;
+                } else {
+                }
+            } else {
+                *self.list = input;
+            }
         }
     }
 }
@@ -272,10 +380,10 @@ impl<'a, T> Iterator for Iter<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.len > 0 {
-            self.head.map(|head| unsafe { 
+            self.head.map(|head| unsafe {
                 self.len -= 1;
                 self.head = (*head.as_ptr()).next;
-                &(*head.as_ptr()).value 
+                &(*head.as_ptr()).value
             })
         } else {
             None
@@ -339,10 +447,10 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.len > 0 {
-            self.head.map(|head| unsafe { 
+            self.head.map(|head| unsafe {
                 self.len -= 1;
                 self.head = (*head.as_ptr()).next;
-                &mut (*head.as_ptr()).value 
+                &mut (*head.as_ptr()).value
             })
         } else {
             None
@@ -408,7 +516,6 @@ mod tests {
         assert_eq!(list.pop_head(), None);
         assert_eq!(list.len(), 0);
     }
-
 
     #[test]
     fn push_pop_tail() {
