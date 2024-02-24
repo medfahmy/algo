@@ -290,7 +290,9 @@ impl<'a, T> CursorMut<'a, T> {
         unsafe {
             if input.is_empty() {
                 return;
-            } else if let Some(curr) = self.curr {
+            }
+
+            if let Some(curr) = self.curr {
                 if let Some(0) = self.index {
                     (*curr.as_ptr()).prev = input.tail.take();
                     (*input.tail.unwrap().as_ptr()).next = Some(curr);
@@ -299,7 +301,25 @@ impl<'a, T> CursorMut<'a, T> {
                     *self.index.as_mut().unwrap() += input.len;
                     input.len = 0;
                 } else {
+                    let prev = (*curr.as_ptr()).prev.unwrap();
+                    let input_head = input.head.take().unwrap();
+                    let input_tail = input.tail.take().unwrap();
+
+                    (*prev.as_ptr()).next = Some(input_head);
+                    (*input_head.as_ptr()).prev = Some(prev);
+                    (*curr.as_ptr()).prev = Some(input_tail);
+                    (*input_tail.as_ptr()).next = Some(curr);
+
+                    *self.index.as_mut().unwrap() += input.len;
+                    self.list.len += input.len;
+                    input.len = 0;
                 }
+            } else if let Some(tail) = self.list.tail {
+                (*tail.as_ptr()).next = input.head.take();
+                (*input.head.unwrap().as_ptr()).prev = Some(tail);
+                self.list.tail = input.tail.take();
+                self.list.len += input.len;
+                input.len = 0;
             } else {
                 *self.list = input;
             }
