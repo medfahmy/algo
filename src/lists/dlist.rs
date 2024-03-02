@@ -299,6 +299,7 @@ impl<'a, T> CursorMut<'a, T> {
                     self.list.head = input.head.take();
 
                     *self.index.as_mut().unwrap() += input.len;
+                    self.list.len += input.len;
                     input.len = 0;
                 } else {
                     let prev = (*curr.as_ptr()).prev.unwrap();
